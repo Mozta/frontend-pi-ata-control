@@ -1,33 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react'
+import styles from "./style";
+import fabLogo from './assets/Fab24_WhiteLogo.png'
+// import './App.css'
+import { Navbar } from './components/Navbar'
+import { Inventary } from './components/Inventary'
+import { Camara1 } from './components/Camara1';
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className='bg-primary w-full overflow-hidden'>
+        <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+          <div className='{`${styles.boxWidth}`}'>
+            <Navbar cartItems={0} toggleCartModal={0} />
+          </div>
+        </div>
+
+        <div className='pt-20'>
+          <div className={`${styles.boxWidth}`}>
+            <h1 className={`${styles.heading2} text-center`}>Pinata control 🪅</h1>
+          </div>
+        </div>
+
+        <main>
+
+          {/* <Inventary addToCart={addToCart} /> */}
+          <Camara1 />
+        </main>
+
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
