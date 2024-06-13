@@ -154,16 +154,3 @@
   filter: blur(750px);
 }
 
-
-.table-image {
-  width: 100px;
-  /* Ajusta el ancho según tus necesidades */
-  height: auto;
-  /* Esto mantendrá la relación de aspecto de la imagen */
-  display: block;
-  margin: 0 auto;
-  /* Centra la imagen en la celda si es más estrecha que 100px */
-  /* Remove background white */
-  background-color: transparent;
-  
-}
