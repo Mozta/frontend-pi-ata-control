@@ -5,14 +5,14 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-reac
 
 export const Header = () => {
     const navigate = useNavigate();
-    
+
     return (
         <div className="fixed top-0 z-50 w-full bg-n-8/90 backdrop-blur-sm border-b border-n-6 lg:bg-n-8/90 lg:backdrop-blur-sm">
             <div className='flex items-center justify-between px-5 lg:px-7.5 xl:px-10 max-lg:py-4'>
                 <a className='flex items-center' href='/'>
-                    <img src={logo} alt="PinataFab" className="h-12" />
+                    <img src={logo} alt="FabPinata" className="h-12" />
                     <h1 className='text-2xl font-medium ml-2'>
-                        PinataFab
+                        FabPinata
                     </h1>
                 </a>
                 <nav className='flex space-x-6'>

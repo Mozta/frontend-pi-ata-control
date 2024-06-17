@@ -3,11 +3,13 @@ import player_control from '../assets/player_control.webp'
 import player_pinata from '../assets/player_pinata.webp'
 import { Player } from '@lottiefiles/react-lottie-player';
 import { apiService } from '../services/apiService';
+import { Camara1 } from './Camara1';
 
 export const Controls = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [pointPos, setPointPos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         apiService.getInventary()
@@ -48,10 +50,11 @@ export const Controls = () => {
                         <h1 className='flex text-2xl font-bold'>
                             Control camera
                         </h1>
-                        <div className='flex justify-center'>
-                            <img
+                        <div className='flex'>
+                            {/* <img
                                 className='border border-violet-600  border-n-6 rounded-lg'
-                                src={player_control} alt="Player control" />
+                                src={player_control} alt="Player control" /> */}
+                            <Camara1 setPoint={setPointPos} />
                         </div>
                     </div>
 
@@ -61,9 +64,12 @@ export const Controls = () => {
                                 Control pos
                             </h1>
                             <div className='flex flex-col justify-end items-end text-right size-40 w-64 bg-gray-300 rounded-lg'>
-                                <p className='font-medium px-2'>X: 90 Y: 120</p>
+                                {/* Draw a red point in the middle of div */}
+                                <div className='absolute w-1 h-1 bg-red-500' style={{ left: `${pointPos.x}%`, top: `${pointPos.y}%` }}></div>
+                                <p className='font-medium px-2'>X: {pointPos.x.toFixed(2)} , Y: {pointPos.y.toFixed(2)}</p>
                             </div>
                         </div>
+
                         <div className='flex flex-col mt-4'>
                             <h1 className='text-2xl font-bold'>
                                 Pinata control
@@ -79,24 +85,6 @@ export const Controls = () => {
 
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-md mt-20 mx-10">
-                    <h2 className="font-bold text-lg text-center">
-                        Controls
-                    </h2>
-                    <div className="flex items-center justify-center mt-4">
-                        <button className="bg-primary text-light px-10 py-2 rounded-full mr-4">
-                            Move up
-                        </button>
-                        <button className="bg-primary text-light px-10 py-2 rounded-full mr-4">
-                            Move down
-                        </button>
-                        <button className="bg-primary text-light px-10 py-2 rounded-full">
-                            Reset
-                        </button>
-
-                    </div>
-
-                </div>
             </div>
         </>
     )
