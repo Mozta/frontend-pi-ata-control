@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import player_control from '../assets/player_control.webp'
-import player_pinata from '../assets/player_pinata.webp'
+import player_control from '../assets/player_control.webp';
+import player_pinata from '../assets/player_pinata.webp';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { apiService } from '../services/apiService';
+import { Camara1 } from './Camara1';
+import { Bubble } from 'react-chartjs-2';
+import { Chart as ChartJS, BubbleController, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(BubbleController, LinearScale, PointElement, Tooltip, Legend);
 
 export const Controls = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [pointPos, setPointPos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         apiService.getInventary()
@@ -23,81 +29,102 @@ export const Controls = () => {
     }, []);
 
     if (loading) {
-        return <div>
-            <Player
-                autoplay
-                loop
-                src='https://lottie.host/f4cbf879-68e9-4d35-b327-7714ecd51b2c/LUAqjYbmxM.json'
-                className="player"
-            ></Player>
-        </div>;
+        return (
+            <div>
+                <Player
+                    autoplay
+                    loop
+                    src='https://lottie.host/f4cbf879-68e9-4d35-b327-7714ecd51b2c/LUAqjYbmxM.json'
+                    className="player"
+                ></Player>
+            </div>
+        );
     }
 
     if (error) {
         return <div>"Error loading data"</div>;
     }
 
+    // Función para mapear la posición del punto a las coordenadas del div
+    const mapPositionToDiv = (x, y) => {
+        return {
+            x: x,
+            y: y * -1 + 180,
+        };
+    };
+
+    const { x, y } = mapPositionToDiv(pointPos.x, pointPos.y);
+
+    // Datos para la gráfica de burbuja
+    const dataBubble = {
+        datasets: [
+            {
+                label: 'Pinata Position',
+                data: [{ x: x, y: y, r: 10 }],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    // Opciones para la gráfica de burbuja
+    const options = {
+        scales: {
+            x: {
+                type: 'linear',
+                position: 'bottom',
+                min: 0,
+                max: 180,
+            },
+            y: {
+                min: 0,
+                max: 180,
+            },
+        },
+    };
+
     return (
-        <>
-            <div className="flex flex-col pt-20 min-h-screen">
-                <h1 className="text-5xl font-bold mb-10 text-center">
-                    #Piñatazostime
-                </h1>
-                <div className='flex flex-row mx-8'>
-                    <div className='basis-3/4 mx-8'>
-                        <h1 className='flex text-2xl font-bold'>
-                            Control camera
+        <div className="flex flex-col pt-20 min-h-screen">
+            <h1 className="text-5xl font-bold mb-10 text-center">
+                #Piñatazostime
+            </h1>
+            <div className='flex flex-row mx-8'>
+                <div className='basis-3/4 mx-8'>
+                    <h1 className='flex text-2xl font-bold'>
+                        Control camera
+                    </h1>
+                    <div className='flex'>
+                        <Camara1 setPoint={setPointPos} />
+                    </div>
+                </div>
+
+                <div className='basis-1/4 mx-8'>
+                    <div className='flex flex-col'>
+                        <h1 className='text-2xl font-bold'>
+                            Control pos
+                        </h1>
+                        <Bubble data={dataBubble} options={options} height={180} />
+                        <div className='bg-gray-200 py-2 rounded-lg text-center'>
+                            <p className='font-medium px-2'>X: {x.toFixed(2)} , Y: {y.toFixed(2)}</p>
+                        </div>
+                    </div>
+
+                    <div className='flex flex-col mt-4'>
+                        <h1 className='text-2xl font-bold'>
+                            Pinata control
                         </h1>
                         <div className='flex justify-center'>
                             <img
                                 className='border border-violet-600  border-n-6 rounded-lg'
-                                src={player_control} alt="Player control" />
+                                src={player_pinata} alt="Player control" />
                         </div>
-                    </div>
-
-                    <div className='basis-1/4 mx-8'>
-                        <div className='flex flex-col'>
-                            <h1 className='text-2xl font-bold'>
-                                Control pos
-                            </h1>
-                            <div className='flex flex-col justify-end items-end text-right size-40 w-64 bg-gray-300 rounded-lg'>
-                                <p className='font-medium px-2'>X: 90 Y: 120</p>
-                            </div>
-                        </div>
-                        <div className='flex flex-col mt-4'>
-                            <h1 className='text-2xl font-bold'>
-                                Pinata control
-                            </h1>
-                            <div className='flex justify-center'>
-                                <img
-                                    className='border border-violet-600  border-n-6 rounded-lg'
-                                    src={player_pinata} alt="Player control" />
-                            </div>
-                        </div>
-
                     </div>
 
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-md mt-20 mx-10">
-                    <h2 className="font-bold text-lg text-center">
-                        Controls
-                    </h2>
-                    <div className="flex items-center justify-center mt-4">
-                        <button className="bg-primary text-light px-10 py-2 rounded-full mr-4">
-                            Move up
-                        </button>
-                        <button className="bg-primary text-light px-10 py-2 rounded-full mr-4">
-                            Move down
-                        </button>
-                        <button className="bg-primary text-light px-10 py-2 rounded-full">
-                            Reset
-                        </button>
-
-                    </div>
-
-                </div>
             </div>
-        </>
-    )
-}
+
+        </div>
+    );
+};
