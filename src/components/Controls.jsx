@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import player_control from '../assets/player_control.webp';
 import player_pinata from '../assets/player_pinata.webp';
 import { Player } from '@lottiefiles/react-lottie-player';
@@ -6,6 +7,7 @@ import { apiService } from '../services/apiService';
 import { Camara1 } from './Camara1';
 import { Bubble } from 'react-chartjs-2';
 import { Chart as ChartJS, BubbleController, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+import { updatePlayerState } from '../services/firestoreService';
 
 ChartJS.register(BubbleController, LinearScale, PointElement, Tooltip, Legend);
 
@@ -14,6 +16,10 @@ export const Controls = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [pointPos, setPointPos] = useState({ x: 0, y: 0 });
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { role } = location.state || {};
 
     useEffect(() => {
         apiService.getInventary()
@@ -26,7 +32,31 @@ export const Controls = () => {
                 setLoading(false);
                 setError(true);
             });
-    }, []);
+
+        const handleBeforeUnload = (event) => {
+            // Custom message
+            event.preventDefault();
+            event.returnValue = '';
+
+            // Update player state
+            if (role === 'control') {
+                updatePlayerState('p1', false);
+            } else if (role === 'hitter') {
+                updatePlayerState('p2', false);
+            }
+
+            // Free the camera
+            if (camara1Ref.current) {
+                camara1Ref.current.releaseCamera();
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [role]);
 
     if (loading) {
         return (
@@ -84,6 +114,15 @@ export const Controls = () => {
         },
     };
 
+    const handleExitGame = async () => {
+        if (role === 'control') {
+            await updatePlayerState('p1', false);
+        } else if (role === 'hitter') {
+            await updatePlayerState('p2', false);
+        }
+        navigate('/');
+    };
+
     return (
         <div className="flex flex-col pt-20 min-h-screen">
             <h1 className="text-5xl font-bold mb-10 text-center">
@@ -121,10 +160,21 @@ export const Controls = () => {
                         </div>
                     </div>
 
+                    <div className='mt-4'>
+                        <p className='text-center text-lg font-bold'>
+                            You are playing as: {role}
+                        </p>
+                    </div>
                 </div>
 
             </div>
 
+            <button
+                className="bg-red-500 text-light px-10 py-2 rounded-full mt-10 self-center"
+                onClick={handleExitGame}
+            >
+                Exit Game
+            </button>
         </div>
     );
 };
