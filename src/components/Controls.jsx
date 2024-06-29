@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import player_control from '../assets/player_control.webp';
 import player_pinata from '../assets/player_pinata.webp';
 import { Player } from '@lottiefiles/react-lottie-player';
@@ -6,6 +7,7 @@ import { apiService } from '../services/apiService';
 import { Camara1 } from './Camara1';
 import { Bubble } from 'react-chartjs-2';
 import { Chart as ChartJS, BubbleController, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+import { getPlayers, updatePlayerState } from '../services/firestoreService';
 
 ChartJS.register(BubbleController, LinearScale, PointElement, Tooltip, Legend);
 
@@ -14,6 +16,11 @@ export const Controls = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [pointPos, setPointPos] = useState({ x: 0, y: 0 });
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { role } = location.state || {};
+    const camara1Ref = useRef(null);
 
     useEffect(() => {
         apiService.getInventary()
@@ -26,7 +33,35 @@ export const Controls = () => {
                 setLoading(false);
                 setError(true);
             });
-    }, []);
+
+        const handleBeforeUnload = async (event) => {
+            event.preventDefault();
+            event.returnValue = '';
+
+            // Update player state
+            if (role === 'control') {
+                await updatePlayerState('p1', false);
+            } else if (role === 'hitter') {
+                await updatePlayerState('p2', false);
+            } else if (role === 'spectator') {
+                const updatedPlayers = await getPlayers();
+                await updatePlayerState('p3', Math.max(updatedPlayers.p3 - 1, 0));
+            }
+
+            // Free the camera
+            if (camara1Ref.current) {
+                camara1Ref.current.releaseCamera();
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('unload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('unload', handleBeforeUnload);
+        };
+    }, [role]);
 
     if (loading) {
         return (
@@ -84,6 +119,24 @@ export const Controls = () => {
         },
     };
 
+    const handleExitGame = async () => {
+        if (role === 'control') {
+            await updatePlayerState('p1', false);
+        } else if (role === 'hitter') {
+            await updatePlayerState('p2', false);
+        } else if (role === 'spectator') {
+            const updatedPlayers = await getPlayers();
+            await updatePlayerState('p3', Math.max(updatedPlayers.p3 - 1, 0));
+        }
+
+        // Free the camera
+        if (camara1Ref.current) {
+            camara1Ref.current.releaseCamera();
+        }
+
+        navigate('/');
+    };
+
     return (
         <div className="flex flex-col pt-20 min-h-screen">
             <h1 className="text-5xl font-bold mb-10 text-center">
@@ -95,7 +148,7 @@ export const Controls = () => {
                         Control camera
                     </h1>
                     <div className='flex'>
-                        <Camara1 setPoint={setPointPos} />
+                        <Camara1 ref={camara1Ref} setPoint={setPointPos} />
                     </div>
                 </div>
 
@@ -121,10 +174,21 @@ export const Controls = () => {
                         </div>
                     </div>
 
+                    <div className='mt-4'>
+                        <p className='text-center text-lg font-bold'>
+                            You are playing as: {role}
+                        </p>
+                    </div>
                 </div>
 
             </div>
 
+            <button
+                className="bg-red-500 text-light px-10 py-2 rounded-full mt-10 self-center"
+                onClick={handleExitGame}
+            >
+                Exit Game
+            </button>
         </div>
     );
 };
