@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import player_control from '../assets/player_control.webp';
 import player_pinata from '../assets/player_pinata.webp';
@@ -7,7 +7,7 @@ import { apiService } from '../services/apiService';
 import { Camara1 } from './Camara1';
 import { Bubble } from 'react-chartjs-2';
 import { Chart as ChartJS, BubbleController, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
-import { updatePlayerState } from '../services/firestoreService';
+import { getPlayers, updatePlayerState } from '../services/firestoreService';
 
 ChartJS.register(BubbleController, LinearScale, PointElement, Tooltip, Legend);
 
@@ -20,6 +20,7 @@ export const Controls = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { role } = location.state || {};
+    const camara1Ref = useRef(null);
 
     useEffect(() => {
         apiService.getInventary()
@@ -33,16 +34,18 @@ export const Controls = () => {
                 setError(true);
             });
 
-        const handleBeforeUnload = (event) => {
-            // Custom message
+        const handleBeforeUnload = async (event) => {
             event.preventDefault();
             event.returnValue = '';
 
             // Update player state
             if (role === 'control') {
-                updatePlayerState('p1', false);
+                await updatePlayerState('p1', false);
             } else if (role === 'hitter') {
-                updatePlayerState('p2', false);
+                await updatePlayerState('p2', false);
+            } else if (role === 'spectator') {
+                const updatedPlayers = await getPlayers();
+                await updatePlayerState('p3', Math.max(updatedPlayers.p3 - 1, 0));
             }
 
             // Free the camera
@@ -52,9 +55,11 @@ export const Controls = () => {
         };
 
         window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('unload', handleBeforeUnload);
 
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('unload', handleBeforeUnload);
         };
     }, [role]);
 
@@ -119,7 +124,16 @@ export const Controls = () => {
             await updatePlayerState('p1', false);
         } else if (role === 'hitter') {
             await updatePlayerState('p2', false);
+        } else if (role === 'spectator') {
+            const updatedPlayers = await getPlayers();
+            await updatePlayerState('p3', Math.max(updatedPlayers.p3 - 1, 0));
         }
+
+        // Free the camera
+        if (camara1Ref.current) {
+            camara1Ref.current.releaseCamera();
+        }
+
         navigate('/');
     };
 
@@ -134,7 +148,7 @@ export const Controls = () => {
                         Control camera
                     </h1>
                     <div className='flex'>
-                        <Camara1 setPoint={setPointPos} />
+                        <Camara1 ref={camara1Ref} setPoint={setPointPos} />
                     </div>
                 </div>
 

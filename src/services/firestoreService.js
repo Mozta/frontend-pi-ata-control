@@ -18,7 +18,8 @@ export const updatePlayerState = async (player, state) => {
     const docRef = doc(db, 'game', 'players');
     await setDoc(docRef, { [player]: state }, { merge: true });
   };
-  
+
+
 // Función para escuchar en tiempo real el documento "players" de la colección "game"
 export const onPlayersSnapshot = (callback) => {
     const docRef = doc(db, 'game', 'players');

@@ -6,7 +6,7 @@ import spectator from '../assets/player_spectator.webp';
 import { getPlayers, updatePlayerState } from '../services/firestoreService';
 
 export const SelectorPlayer = ({ backState }) => {
-    const [players, setPlayers] = useState({ p1: false, p2: false });
+    const [players, setPlayers] = useState({ p1: false, p2: false, p3: 0 });
     const [selectedPlayer, setSelectedPlayer] = useState(null);
     const navigate = useNavigate();
 
@@ -27,7 +27,8 @@ export const SelectorPlayer = ({ backState }) => {
         } else if (selectedPlayer === 'hitter') {
             await updatePlayerState('p2', false);
         } else if (selectedPlayer === 'spectator') {
-            await updatePlayerState('p3', 0);
+            const updatedPlayers = await getPlayers();
+            await updatePlayerState('p3', Math.max(updatedPlayers.p3 - 1, 0));
         }
 
         // Update Firestore and local state with new selection
@@ -38,7 +39,8 @@ export const SelectorPlayer = ({ backState }) => {
             await updatePlayerState('p2', true);
             setSelectedPlayer(role);
         } else if (role === 'spectator') {
-            await updatePlayerState('p3', 1);
+            const updatedPlayers = await getPlayers();
+            await updatePlayerState('p3', updatedPlayers.p3 + 1);
             setSelectedPlayer(role);
         }
     };
@@ -53,7 +55,8 @@ export const SelectorPlayer = ({ backState }) => {
         } else if (selectedPlayer === 'hitter') {
             await updatePlayerState('p2', false);
         } else if (selectedPlayer === 'spectator') {
-            await updatePlayerState('p3', 0);
+            const updatedPlayers = await getPlayers();
+            await updatePlayerState('p3', Math.max(updatedPlayers.p3 - 1, 0));
         }
         setSelectedPlayer(null);
     }
