@@ -1,40 +1,50 @@
-import { useState, useEffect } from 'react'
-import styles from "./style";
-import fabLogo from './assets/Fab24_WhiteLogo.png'
-// import './App.css'
-import { Navbar } from './components/Navbar'
-import { Inventary } from './components/Inventary'
-import { Camara1 } from './components/Camara1';
-
+import { useState } from 'react';
+import { Home } from './components/Home';
+import { Hero } from './components/Hero';
+import { SelectorPlayer } from './components/SelectorPlayer';
+import { Game } from './components/Game';
 
 function App() {
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [enterGame, setEnterGame] = useState(false);
+  const [showSelector, setShowSelector] = useState(false);
 
+  const handleEnterGame = () => {
+    setEnterGame(true);
+    setShowSelector(false);
+  };
+
+  const handleShowSelector = () => {
+    setShowSelector(true);
+  };
+
+  const handleBack = () => {
+    setEnterGame(false);
+    setShowSelector(false);
+  };
 
   return (
     <>
-      <div className='bg-primary w-full overflow-hidden'>
-        <div className={`${styles.paddingX} ${styles.flexCenter}`}>
-          <div className='{`${styles.boxWidth}`}'>
-            <Navbar cartItems={0} toggleCartModal={0} />
-          </div>
-        </div>
-
-        <div className='pt-20'>
-          <div className={`${styles.boxWidth}`}>
-            <h1 className={`${styles.heading2} text-center`}>Pinata control 🪅</h1>
-          </div>
-        </div>
-
-        <main>
-
-          {/* <Inventary addToCart={addToCart} /> */}
-          <Camara1 />
-        </main>
-
+      <div className="flex flex-col mt-5 justify-center items-center min-h-screen text-center">
+        {showSelector
+          ? (
+            <SelectorPlayer backState={handleBack} onEnterGame={handleEnterGame} />
+          )
+          : (
+            <>
+              <Hero />
+              <Home onEnterSelector={handleShowSelector} />
+            </>
+          )}
+        {enterGame && showSelector && (
+          <button
+            className="bg-secondary text-light px-10 py-2 rounded-full mt-10"
+            onClick={handleShowSelector}>
+            Select Player
+          </button>
+        )}
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
