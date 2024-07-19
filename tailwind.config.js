@@ -9,8 +9,10 @@ export default {
     extend: {
       colors: {
         primary: "#28296A",
+        'primary-dark': "#1f1f54", // Color para el hover de primary
         secondary: "#EC008C",
-        
+        'secondary-dark': "#b80070", // Color para el hover de secondary
+
         dark: '#282828',
         royalblue: '#28296A',
         hotpink: '#EC008C',
@@ -38,4 +40,3 @@ export default {
   },
   plugins: [],
 }
-

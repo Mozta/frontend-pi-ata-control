@@ -5,7 +5,7 @@ import { Camera } from '@mediapipe/camera_utils';
 import * as drawingUtils from '@mediapipe/drawing_utils';
 import { connectToRoom, startVideoStream, getRoom, getToken } from '../services/livekitService';
 
-export const Camara1 = ({ username, setPoint }) => {
+export const Emisor = ({ setPoint }) => {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
     const videoRef = useRef(null);
@@ -18,8 +18,7 @@ export const Camara1 = ({ username, setPoint }) => {
     useEffect(() => {
         const initializeCameraAndRoom = async () => {
             if (webcamRef.current && webcamRef.current.video && !room) {
-                const newRoom = await connectToRoom(import.meta.env.VITE_LIVEKIT_SERVER_URL,
-                    await getToken(`${username}-controller`));
+                const newRoom = await connectToRoom('wss://fab-pinata-zt86ze4g.livekit.cloud', await getToken('emitter'));
                 setRoom(newRoom);
 
                 const localVideoTrack = await startVideoStream();
