@@ -11,7 +11,7 @@ import { getPlayers, updatePlayerState } from '../services/firestoreService';
 
 ChartJS.register(BubbleController, LinearScale, PointElement, Tooltip, Legend);
 
-export const Controls = () => {
+export const Controls = ({ username }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -148,7 +148,7 @@ export const Controls = () => {
                         Control camera
                     </h1>
                     <div className='flex'>
-                        <Camara1 ref={camara1Ref} setPoint={setPointPos} />
+                        <Camara1 username={username} ref={camara1Ref} setPoint={setPointPos} />
                     </div>
                 </div>
 
