@@ -5,6 +5,7 @@ import { getToken } from '../services/livekitService';
 import { updatePlayerState } from '../services/firestoreService';
 import { BubbleChart } from './BubbleChart';
 import { CameraManager } from './CameraManager';
+import { VideoEmitter } from './VideoEmitter';
 import player_pinata from '../assets/player_pinata.webp';
 
 export const Controls = ({ username }) => {
@@ -73,7 +74,8 @@ export const Controls = ({ username }) => {
                         </button>
                     </div>
                     <div className="flex">
-                        <CameraManager token={token} onHandDetected={handleHandDetected} />
+                        {/* <CameraManager token={token} onHandDetected={handleHandDetected} /> */}
+                        <VideoEmitter token={token} onHandDetected={handleHandDetected} />
                     </div>
                 </div>
                 <div className="basis-1/4 mx-8">
