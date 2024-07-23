@@ -60,7 +60,7 @@ export const Controls = ({ username }) => {
 
     return (
         <div className="flex flex-col pt-20 min-h-screen">
-            <h1 className="text-5xl font-bold mb-10 text-center">#Piñatazostime</h1>
+            <h1 className="text-3xl font-bold mb-10 text-center">#Piñatazostime</h1>
             <div className="flex flex-row mx-8">
                 <div className="basis-3/4 mx-8">
                     <div className="flex justify-between mb-4">

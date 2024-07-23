@@ -17,9 +17,9 @@ export const CameraManager = ({ token, onHandDetected }) => {
 
     return (
         <div className="flex flex-col items-center w-full">
-            <Webcam ref={webcamRef} className='rounded-3xl w-full' />
-            {/* <canvas ref={canvasRef} className='rounded-3xl w-full' width="1280px" height="720px"></canvas>
-            <CameraMediapipe videoRef={videoRef} canvasRef={canvasRef} onHandDetected={onHandDetected} /> */}
+            <Webcam ref={webcamRef} className='rounded-3xl w-full' style={{ display: 'none' }} />
+            <canvas ref={canvasRef} className='rounded-3xl w-full' width="1280px" height="720px"></canvas>
+            <CameraMediapipe videoRef={videoRef} canvasRef={canvasRef} onHandDetected={onHandDetected} />
             <CameraLive videoRef={videoRef} token={token} />
         </div>
     );

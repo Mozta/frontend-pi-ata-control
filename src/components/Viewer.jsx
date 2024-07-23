@@ -43,7 +43,7 @@ export const Viewer = ({ username }) => {
 
     return (
         <div className="flex flex-col pt-20 min-h-screen">
-            <h1 className="text-5xl font-bold mb-10 text-center">
+            <h1 className="text-3xl font-bold mb-10 text-center">
                 #Piñatazostime
             </h1>
             <LiveKitRoom

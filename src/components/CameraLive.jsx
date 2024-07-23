@@ -37,7 +37,7 @@ export const CameraLive = ({ videoRef, token }) => {
                 isPublishing.current = false;
             }
         };
-    }, [token, videoRef]);
+    }, [videoRef]);
 
     return null;
 };
