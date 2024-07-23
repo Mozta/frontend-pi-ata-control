@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { connectToRoom, startVideoStream } from '../services/livekitService';
 
-const serverUrl = 'wss://fab-pinata-zt86ze4g.livekit.cloud';
+const serverUrl = import.meta.env.VITE_LIVEKIT_SERVER_URL;
 
 export const CameraLive = ({ videoRef, token }) => {
   const isPublishing = useRef(false);

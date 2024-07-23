@@ -5,10 +5,4 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   // base: 'https://mozta.github.io/frontend-pinata-control/'
-  define: {
-    global: {},
-    process: {
-      env: {}
-    }
-  }
 })
