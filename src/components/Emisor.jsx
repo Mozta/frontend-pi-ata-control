@@ -3,20 +3,22 @@ import Webcam from "react-webcam";
 import { Hands } from '@mediapipe/hands';
 import { Camera } from '@mediapipe/camera_utils';
 import * as drawingUtils from '@mediapipe/drawing_utils';
-import { connectToRoom, startVideoStream } from '../services/livekitService';
+import { connectToRoom, startVideoStream, getRoom, getToken } from '../services/livekitService';
 
-export const Camara1 = ({ token, username, setPoint, autoStart = false }) => {
+export const Emisor = ({ setPoint }) => {
     const webcamRef = useRef(null);
     const canvasRef = useRef(null);
     const videoRef = useRef(null);
-    const [isCameraActive, setIsCameraActive] = useState(autoStart);
+    const [isCameraActive, setIsCameraActive] = useState(false);
     const [cameraInstance, setCameraInstance] = useState(null);
     const [room, setRoom] = useState(null);
+    const [pointPos, setPointPos] = useState({ x: 0, y: 0 });
+    const [transformedPos, setTransformedPos] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         const initializeCameraAndRoom = async () => {
             if (webcamRef.current && webcamRef.current.video && !room) {
-                const newRoom = await connectToRoom(import.meta.env.VITE_LIVEKIT_SERVER_URL, token);
+                const newRoom = await connectToRoom('wss://fab-pinata-zt86ze4g.livekit.cloud', await getToken('emitter'));
                 setRoom(newRoom);
 
                 const localVideoTrack = await startVideoStream();
@@ -84,8 +86,11 @@ export const Camara1 = ({ token, username, setPoint, autoStart = false }) => {
                     drawingUtils.drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', lineWidth: 2 });
 
                     const point9 = landmarks[9];
+                    setPointPos({ x: point9.x * canvasElement.width, y: point9.y * canvasElement.height });
+
                     const convertedX = point9.x * 180;
                     const convertedY = point9.y * 180;
+                    setTransformedPos({ x: convertedX, y: convertedY });
                     setPoint({ x: convertedX, y: convertedY });
                 }
             }
@@ -95,7 +100,7 @@ export const Camara1 = ({ token, username, setPoint, autoStart = false }) => {
         return () => {
             stopCameraAndRoom();
         };
-    }, [isCameraActive, token]);
+    }, [isCameraActive]);
 
     const handleToggleCamera = () => {
         setIsCameraActive(prevState => !prevState);
@@ -135,6 +140,12 @@ export const Camara1 = ({ token, username, setPoint, autoStart = false }) => {
                         Restart Camera
                     </button>
                 </div>
+            </div>
+            <div className="mt-4 p-4 bg-white rounded-lg shadow-md">
+                <h3 className="text-lg font-bold">Position of Point 9:</h3>
+                <p>X: {pointPos.x.toFixed(2)}, Y: {pointPos.y.toFixed(2)}</p>
+                <h3 className="text-lg font-bold mt-4">Converted Position (0-180):</h3>
+                <p>X: {transformedPos.x.toFixed(2)}, Y: {transformedPos.y.toFixed(2)}</p>
             </div>
         </div>
     );
