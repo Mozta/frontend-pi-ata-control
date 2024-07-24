@@ -65,28 +65,23 @@ export const VideoEmitter = ({ onHandDetected }) => {
         }
         canvasCtx.restore();
 
-        
-
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
             const hand = results.multiHandLandmarks[0];
             const convertedX = hand[9].x * 180;
             const convertedY = hand[9].y * 180;
             onHandDetected({ x: convertedX, y: convertedY });
-
-
-            // const hand = results.multiHandLandmarks[0];
-            // const point = { x: hand[0].x, y: hand[0].y };
-            // onHandDetected(point);
         }
     };
 
     return (
         <div className='flex flex-col items-center w-full'>
-            <h2>Emitiendo...</h2>
+            <div className="flex items-center mb-4">
+                <div className="bg-red-600 rounded-full w-3 h-3 mr-2 animate-pulse"></div>
+                <span className="text-red-600 font-semibold">LIVE</span>
+            </div>
             {isLoading ? <p>Cargando video...</p> : null}
             <video ref={localVideoRef} autoPlay playsInline muted style={{ display: 'none' }}></video>
             <canvas ref={canvasRef} className="rounded-3xl w-full" width="1280px" height="720px"></canvas>
-            {/* <button onClick={onClose}>Detener Emisión</button> */}
         </div>
     );
 };
