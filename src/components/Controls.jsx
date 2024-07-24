@@ -4,15 +4,17 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import { getToken } from '../services/livekitService';
 import { updatePlayerState } from '../services/firestoreService';
 import { BubbleChart } from './BubbleChart';
-import { CameraManager } from './CameraManager';
 import { VideoEmitter } from './VideoEmitter';
 import player_pinata from '../assets/player_pinata.webp';
+import { connectMQTT } from '../services/mqttService';
 
 export const Controls = ({ username }) => {
     const [token, setToken] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [pointPos, setPointPos] = useState({ x: 0, y: 0 });
+    const [mqttClient, setMqttClient] = useState(null);
+    const [isPublishing, setIsPublishing] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -30,7 +32,19 @@ export const Controls = ({ username }) => {
                 setLoading(false);
             }
         };
+
+        const setupMqttClient = () => {
+            connectMQTT(
+                (client) => {
+                    setMqttClient(client);
+                    console.log('MQTT client set');
+                },
+                (err) => console.error('MQTT connection failed', err)
+            );
+        };
+
         fetchToken();
+        setupMqttClient();
     }, [username]);
 
     const handleExitGame = async () => {
@@ -40,6 +54,22 @@ export const Controls = ({ username }) => {
 
     const handleHandDetected = (point) => {
         setPointPos(point);
+        console.log(`isPublishing: ${isPublishing}, mqttClient: ${mqttClient}`);
+        if (isPublishing && mqttClient) {
+            const data = `${point.x.toFixed(0)},${point.y.toFixed(0)}`;
+            mqttClient.publish("FAB24/test", data, {}, (err) => {
+                if (err) {
+                    console.error('Failed to publish message:', err);
+                } else {
+                    console.log(`Published: ${data}`);
+                }
+            });
+        }
+    };
+
+    const togglePublishing = () => {
+        setIsPublishing((prev) => !prev);
+        console.log(`isPublishing toggled to: ${!isPublishing}`);
     };
 
     if (loading) {
@@ -61,7 +91,7 @@ export const Controls = ({ username }) => {
 
     return (
         <div className="flex flex-col pt-20 min-h-screen">
-            <h1 className="text-3xl font-bold mb-10 text-center">#Piñatazostime</h1>
+            <h1 className="text-5xl font-bold mb-10 text-center">#Piñatazostime</h1>
             <div className="flex flex-row mx-8">
                 <div className="basis-3/4 mx-8">
                     <div className="flex justify-between mb-4">
@@ -74,7 +104,6 @@ export const Controls = ({ username }) => {
                         </button>
                     </div>
                     <div className="flex">
-                        {/* <CameraManager token={token} onHandDetected={handleHandDetected} /> */}
                         <VideoEmitter token={token} onHandDetected={handleHandDetected} />
                     </div>
                 </div>
@@ -97,6 +126,14 @@ export const Controls = ({ username }) => {
                         <p className="text-center text-lg font-bold">
                             You are playing as: {role}
                         </p>
+                    </div>
+                    <div className="flex justify-center mt-4">
+                        <button
+                            className={`px-4 py-2 rounded-full ${isPublishing ? 'bg-green-500' : 'bg-blue-500'} text-white`}
+                            onClick={togglePublishing}
+                        >
+                            {isPublishing ? 'Stop Publishing' : 'Start Publishing'}
+                        </button>
                     </div>
                 </div>
             </div>

@@ -5,7 +5,7 @@ import "@livekit/components-styles";
 
 const serverUrl = 'wss://fab-pinata-zt86ze4g.livekit.cloud';
 
-export const VideoEmitter = ({ onHandDetected }) => {
+export const VideoEmitter = ({ token, onHandDetected }) => {
     const [room, setRoom] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const localVideoRef = useRef(null);
@@ -14,7 +14,7 @@ export const VideoEmitter = ({ onHandDetected }) => {
     useEffect(() => {
         const startEmitter = async () => {
             setIsLoading(true);
-            const token = await getToken('emitter');
+            // const token = await getToken('emitter');
             const room = await connectToRoom(serverUrl, token);
             setRoom(room);
             <ConnectionStateToast />
