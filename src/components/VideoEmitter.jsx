@@ -81,11 +81,11 @@ export const VideoEmitter = ({ onHandDetected }) => {
     };
 
     return (
-        <div>
+        <div className='flex flex-col items-center w-full'>
             <h2>Emitiendo...</h2>
             {isLoading ? <p>Cargando video...</p> : null}
             <video ref={localVideoRef} autoPlay playsInline muted style={{ display: 'none' }}></video>
-            <canvas ref={canvasRef} className="output_canvas" width="1280px" height="720px" style={{ width: '400px' }}></canvas>
+            <canvas ref={canvasRef} className="rounded-3xl w-full" width="1280px" height="720px"></canvas>
             {/* <button onClick={onClose}>Detener Emisión</button> */}
         </div>
     );
