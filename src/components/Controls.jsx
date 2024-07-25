@@ -7,6 +7,8 @@ import { BubbleChart } from './BubbleChart';
 import { VideoEmitter } from './VideoEmitter';
 import player_pinata from '../assets/player_pinata.webp';
 import { connectMQTT } from '../services/mqttService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 
 export const Controls = ({ username }) => {
     const [token, setToken] = useState('');
@@ -72,6 +74,10 @@ export const Controls = ({ username }) => {
 
     const handleExitGame = async () => {
         await updatePlayerState('p1', false);
+
+        if (mqttClient) {
+            mqttClient.end();
+        }
         navigate('/');
     };
 
@@ -125,7 +131,7 @@ export const Controls = ({ username }) => {
                             className="bg-red-500 text-white px-10 py-2 rounded-full"
                             onClick={handleExitGame}
                         >
-                            Exit Game
+                            <FontAwesomeIcon icon={faArrowRightFromBracket} />  Exit Game
                         </button>
                     </div>
                     <div className="flex">
