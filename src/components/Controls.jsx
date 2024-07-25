@@ -15,6 +15,7 @@ export const Controls = ({ username }) => {
     const [pointPos, setPointPos] = useState({ x: 0, y: 0 });
     const [mqttClient, setMqttClient] = useState(null);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [mqttConnected, setMqttConnected] = useState(false);  // Estado para conexión MQTT
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -33,18 +34,7 @@ export const Controls = ({ username }) => {
             }
         };
 
-        // const setupMqttClient = () => {
-        //     connectMQTT(
-        //         (client) => {
-        //             setMqttClient(client);
-        //             console.log('MQTT client set');
-        //         },
-        //         (err) => console.error('MQTT connection failed', err)
-        //     );
-        // };
-
         fetchToken();
-        // setupMqttClient();
     }, [username]);
 
     useEffect(() => {
@@ -54,10 +44,12 @@ export const Controls = ({ username }) => {
                 (client) => {
                     console.log('MQTT client connected successfully');
                     setMqttClient(client);
+                    setMqttConnected(true);  // Indica que MQTT está conectado
                 },
                 (err) => {
                     console.error('MQTT connection failed', err);
                     setMqttClient(null);
+                    setMqttConnected(false);  // Indica que MQTT no está conectado
                 }
             );
         };
@@ -66,7 +58,7 @@ export const Controls = ({ username }) => {
     }, []);
 
     useEffect(() => {
-        if (isPublishing) {
+        if (isPublishing && mqttClient) {
             const data = `${pointPos.x.toFixed(0)},${pointPos.y.toFixed(0)}`;
             mqttClient.publish("FAB24/test", data, {}, (err) => {
                 if (err) {
@@ -86,16 +78,6 @@ export const Controls = ({ username }) => {
     const handleHandDetected = (point) => {
         setPointPos(point);
         console.log(`isPublishing: ${isPublishing}, mqttClient: ${mqttClient}`);
-        if (isPublishing && mqttClient) {
-            const data = `${point.x.toFixed(0)},${point.y.toFixed(0)}`;
-            mqttClient.publish("FAB24/test", data, {}, (err) => {
-                if (err) {
-                    console.error('Failed to publish message:', err);
-                } else {
-                    console.log(`Published: ${data}`);
-                }
-            });
-        }
     };
 
     const togglePublishing = () => {
@@ -122,7 +104,19 @@ export const Controls = ({ username }) => {
 
     return (
         <div className="flex flex-col pt-20 min-h-screen">
-            <h1 className="text-5xl font-bold mb-10 text-center">#Piñatazostime</h1>
+            <h1 className="text-3xl font-bold mb-10 text-center">#Piñatazostime</h1>
+            <div className="flex justify-center mb-4">
+                {/* Indicador de estado MQTT */}
+                <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${mqttConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span>{mqttConnected ? 'MQTT Connected' : 'MQTT Disconnected'}</span>
+                </div>
+                {/* Indicador de estado de publicación */}
+                <div className="flex items-center space-x-2 ml-4">
+                    <div className={`w-3 h-3 rounded-full ${isPublishing ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                    <span>{isPublishing ? 'Publishing' : 'Not Publishing'}</span>
+                </div>
+            </div>
             <div className="flex flex-row mx-8">
                 <div className="basis-3/4 mx-8">
                     <div className="flex justify-between mb-4">
