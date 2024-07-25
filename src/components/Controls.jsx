@@ -33,19 +33,50 @@ export const Controls = ({ username }) => {
             }
         };
 
-        const setupMqttClient = () => {
-            connectMQTT(
-                (client) => {
-                    setMqttClient(client);
-                    console.log('MQTT client set');
-                },
-                (err) => console.error('MQTT connection failed', err)
-            );
-        };
+        // const setupMqttClient = () => {
+        //     connectMQTT(
+        //         (client) => {
+        //             setMqttClient(client);
+        //             console.log('MQTT client set');
+        //         },
+        //         (err) => console.error('MQTT connection failed', err)
+        //     );
+        // };
 
         fetchToken();
-        setupMqttClient();
+        // setupMqttClient();
     }, [username]);
+
+    useEffect(() => {
+        const setupMqttClient = () => {
+            console.log('Attempting to connect MQTT...');
+            connectMQTT(
+                (client) => {
+                    console.log('MQTT client connected successfully');
+                    setMqttClient(client);
+                },
+                (err) => {
+                    console.error('MQTT connection failed', err);
+                    setMqttClient(null);
+                }
+            );
+        };
+    
+        setupMqttClient();
+    }, []);
+
+    useEffect(() => {
+        if (isPublishing) {
+            const data = `${pointPos.x.toFixed(0)},${pointPos.y.toFixed(0)}`;
+            mqttClient.publish("FAB24/test", data, {}, (err) => {
+                if (err) {
+                    console.error('Failed to publish message:', err);
+                } else {
+                    console.log(`Published: ${data}`);
+                }
+            });
+        }
+    }, [isPublishing, pointPos]);
 
     const handleExitGame = async () => {
         await updatePlayerState('p1', false);
