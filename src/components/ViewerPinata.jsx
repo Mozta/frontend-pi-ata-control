@@ -13,7 +13,7 @@ import { Player } from '@lottiefiles/react-lottie-player';
 const serverUrl = import.meta.env.VITE_LIVEKIT_SERVER_URL;
 // const serverUrl = 'wss://fab-pinata-zt86ze4g.livekit.cloud';
 
-export const Viewer = ({ username }) => {
+export const ViewerPinata = ({ username, onHandleExitGame }) => {
     const navigate = useNavigate();
     const [token, setToken] = useState('');
 
@@ -26,6 +26,7 @@ export const Viewer = ({ username }) => {
     }, []);
 
     const handleLeave = () => {
+        onHandleExitGame();
         navigate('/');
     };
 
@@ -42,23 +43,17 @@ export const Viewer = ({ username }) => {
     }
 
     return (
-        <div className="flex flex-col px-20 w-full">
-            <h1 className="text-3xl font-bold mb-10 text-center">
-                #Piñatazostime
-            </h1>
-            <LiveKitRoom
-                video={false}
-                audio={false}
-                token={token}
-                serverUrl={serverUrl}
-                data-lk-theme="default"
-                style={{ height: '70vh' }}
-                onDisconnected={handleLeave}
-            >
-                <VideoConference />
-                <ConnectionStateToast />
-            </LiveKitRoom>
-        </div>
-
+        <LiveKitRoom
+            video={false}
+            audio={false}
+            token={token}
+            serverUrl={serverUrl}
+            data-lk-theme="default"
+            style={{ height: '70vh' }}
+            onDisconnected={handleLeave}
+        >
+            <VideoConference />
+            <ConnectionStateToast />
+        </LiveKitRoom>
     );
 };

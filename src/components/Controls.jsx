@@ -5,10 +5,11 @@ import { getToken } from '../services/livekitService';
 import { updatePlayerState } from '../services/firestoreService';
 import { BubbleChart } from './BubbleChart';
 import { VideoEmitter } from './VideoEmitter';
+import { ViewerPinata } from './ViewerPinata';
 import player_pinata from '../assets/player_pinata.webp';
 import { connectMQTT } from '../services/mqttService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faPlay, faStop } from '@fortawesome/free-solid-svg-icons'
 
 export const Controls = ({ username }) => {
     const [token, setToken] = useState('');
@@ -55,7 +56,7 @@ export const Controls = ({ username }) => {
                 }
             );
         };
-    
+
         setupMqttClient();
     }, []);
 
@@ -93,7 +94,7 @@ export const Controls = ({ username }) => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
+            <div className="flex justify-center items-center w-full">
                 <Player
                     autoplay
                     loop
@@ -109,63 +110,75 @@ export const Controls = ({ username }) => {
     }
 
     return (
-        <div className="flex flex-col pt-20 min-h-screen">
-            <h1 className="text-3xl font-bold mb-10 text-center">#Piñatazostime</h1>
-            <div className="flex justify-center mb-4">
-                {/* Indicador de estado MQTT */}
-                <div className="flex items-center space-x-2">
-                    <div className={`w-3 h-3 rounded-full ${mqttConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <span>{mqttConnected ? 'MQTT Connected' : 'MQTT Disconnected'}</span>
-                </div>
-                {/* Indicador de estado de publicación */}
-                <div className="flex items-center space-x-2 ml-4">
-                    <div className={`w-3 h-3 rounded-full ${isPublishing ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
-                    <span>{isPublishing ? 'Publishing' : 'Not Publishing'}</span>
-                </div>
-            </div>
+        <div className="flex flex-col w-full">
+            <h1 className="text-3xl font-bold mb-2 text-center">#Piñatazostime</h1>
+
             <div className="flex flex-row mx-8">
                 <div className="basis-3/4 mx-8">
                     <div className="flex justify-between mb-4">
-                        <h1 className="text-2xl font-bold">Control camera</h1>
-                        <button
-                            className="bg-red-500 text-white px-10 py-2 rounded-full"
-                            onClick={handleExitGame}
-                        >
-                            <FontAwesomeIcon icon={faArrowRightFromBracket} />  Exit Game
-                        </button>
+                        <div className="">
+                            <h1 className="text-2xl font-bold">Control camera</h1>
+                            <div className="flex items-center mb-4">
+                                <div className="bg-red-600 rounded-full w-3 h-3 mr-2 animate-pulse"></div>
+                                <span className="text-red-600 font-semibold">LIVE</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <button
+                                className={`px-6 py-2 rounded-full ${isPublishing ? 'bg-green-500' : 'bg-blue-500'} text-white`}
+                                onClick={togglePublishing}
+                            >
+                                {isPublishing ? (
+                                    <>
+                                        <FontAwesomeIcon icon={faStop} />   Stop Play
+                                    </>
+                                ) : (
+                                    <>
+                                        <FontAwesomeIcon icon={faPlay} />   Start Play
+                                    </>
+                                )}
+
+                            </button>
+                        </div>
                     </div>
-                    <div className="flex">
-                        <VideoEmitter token={token} onHandDetected={handleHandDetected} />
+                    <div className="flex justify-center">
+                        {/* <VideoEmitter token={token} onHandDetected={handleHandDetected} /> */}
+                        <ViewerPinata username={username} onHandleExitGame={handleExitGame} />
                     </div>
                 </div>
                 <div className="basis-1/4 mx-8">
+                    <div className="flex justify-center mb-4">
+                        {/* Indicador de estado MQTT */}
+                        <div className="flex items-center space-x-2">
+                            <div className={`w-3 h-3 rounded-full ${mqttConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            <span>{mqttConnected ? 'MQTT Connected' : 'MQTT Disconnected'}</span>
+                        </div>
+                        {/* Indicador de estado de publicación */}
+                        <div className="flex items-center space-x-2 ml-4">
+                            <div className={`w-3 h-3 rounded-full ${isPublishing ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                            <span>{isPublishing ? 'Publishing' : 'Not Publishing'}</span>
+                        </div>
+                    </div>
                     <div className="flex flex-col mb-4">
                         <h1 className="text-2xl font-bold">Control pos</h1>
                         <BubbleChart pointPos={pointPos} />
                     </div>
                     <div className="flex flex-col mb-4">
-                        <h1 className="text-2xl font-bold">Pinata control</h1>
-                        <div className="flex justify-center">
-                            <img
-                                className="border border-violet-600 rounded-lg"
-                                src={player_pinata}
-                                alt="Player control"
-                            />
-                        </div>
+                        <VideoEmitter token={token} onHandDetected={handleHandDetected} />
                     </div>
                     <div className="mt-4">
                         <p className="text-center text-lg font-bold">
                             You are playing as: {role}
                         </p>
                     </div>
-                    <div className="flex justify-center mt-4">
+                    {/* <div className="flex justify-center mt-4">
                         <button
                             className={`px-4 py-2 rounded-full ${isPublishing ? 'bg-green-500' : 'bg-blue-500'} text-white`}
                             onClick={togglePublishing}
                         >
                             {isPublishing ? 'Stop Publishing' : 'Start Publishing'}
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
