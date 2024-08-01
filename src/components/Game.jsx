@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Controls } from './Controls';
 import { Viewer } from './Viewer';
+import { getPlayers, updatePlayerState } from '../services/firestoreService';
 
 export const Game = () => {
     const navigate = useNavigate();
@@ -12,6 +13,8 @@ export const Game = () => {
     React.useEffect(() => {
         if (!role || !name) {
             navigate('/');
+        } else if (role === 'controller') {
+            updatePlayerState('p1', true);
         }
     }, [role, name, navigate]);
 

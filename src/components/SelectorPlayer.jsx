@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getPlayers } from '../services/firestoreService';
 
 export const SelectorPlayer = () => {
     const { t } = useTranslation();
     const [name, setName] = useState('');
+    const [isControllerAvailable, setIsControllerAvailable] = useState(true);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchPlayerState = async () => {
+            try {
+                const players = await getPlayers();
+                setIsControllerAvailable(!players.p1);
+            } catch (error) {
+                console.error('Error fetching player state:', error);
+            }
+        };
+
+        fetchPlayerState();
+    });
 
     const handleStartGame = (userType) => {
         navigate('/game', { state: { role: userType, name } });
@@ -28,7 +43,7 @@ export const SelectorPlayer = () => {
                 <button
                     className="bg-primary text-light px-10 py-2 rounded-full mt-5 w-full hover:bg-primary-dark disabled:opacity-50"
                     onClick={() => handleStartGame('controller')}
-                    disabled={!name}
+                    disabled={!name || !isControllerAvailable}
                 >
                     {t('controller')}
                 </button>
