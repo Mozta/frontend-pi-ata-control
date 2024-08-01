@@ -10,8 +10,10 @@ import player_pinata from '../assets/player_pinata.webp';
 import { connectMQTT } from '../services/mqttService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRightFromBracket, faPlay, faStop } from '@fortawesome/free-solid-svg-icons'
+import { useTranslation } from 'react-i18next';
 
 export const Controls = ({ username }) => {
+    const { t } = useTranslation();
     const [token, setToken] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -106,7 +108,7 @@ export const Controls = ({ username }) => {
     }
 
     if (error) {
-        return <div>Error loading data</div>;
+        return <div>{t('errorLoadingData')}</div>;
     }
 
     return (
@@ -117,10 +119,10 @@ export const Controls = ({ username }) => {
                 <div className="basis-3/4 mx-8">
                     <div className="flex justify-between mb-4">
                         <div className="">
-                            <h1 className="text-2xl font-bold">Control camera</h1>
+                            <h1 className="text-2xl font-bold">{t('controlCamera')}</h1>
                             <div className="flex items-center mb-4">
                                 <div className="bg-red-600 rounded-full w-3 h-3 mr-2 animate-pulse"></div>
-                                <span className="text-red-600 font-semibold">LIVE</span>
+                                <span className="text-red-600 font-semibold">{t('live')}</span>
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -130,11 +132,11 @@ export const Controls = ({ username }) => {
                             >
                                 {isPublishing ? (
                                     <>
-                                        <FontAwesomeIcon icon={faStop} />   Stop Play
+                                        <FontAwesomeIcon icon={faStop} />   {t('stopPlay')}
                                     </>
                                 ) : (
                                     <>
-                                        <FontAwesomeIcon icon={faPlay} />   Start Play
+                                        <FontAwesomeIcon icon={faPlay} />   {t('startPlay')}
                                     </>
                                 )}
 
@@ -151,16 +153,16 @@ export const Controls = ({ username }) => {
                         {/* Indicador de estado MQTT */}
                         <div className="flex items-center space-x-2">
                             <div className={`w-3 h-3 rounded-full ${mqttConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                            <span>{mqttConnected ? 'MQTT Connected' : 'MQTT Disconnected'}</span>
+                            <span>{mqttConnected ? t('mqttConnected') : t('mqttDisconnected')}</span>
                         </div>
                         {/* Indicador de estado de publicación */}
                         <div className="flex items-center space-x-2 ml-4">
                             <div className={`w-3 h-3 rounded-full ${isPublishing ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
-                            <span>{isPublishing ? 'Publishing' : 'Not Publishing'}</span>
+                            <span>{isPublishing ? t('publishing') : t('notPublishing')}</span>
                         </div>
                     </div>
                     <div className="flex flex-col mb-4">
-                        <h1 className="text-2xl font-bold">Control pos</h1>
+                        <h1 className="text-2xl font-bold">{t('controlPos')}</h1>
                         <BubbleChart pointPos={pointPos} />
                     </div>
                     <div className="flex flex-col mb-4">
@@ -168,17 +170,9 @@ export const Controls = ({ username }) => {
                     </div>
                     <div className="mt-4">
                         <p className="text-center text-lg font-bold">
-                            You are playing as: {role}
+                            {t('playingAs', { role })}
                         </p>
                     </div>
-                    {/* <div className="flex justify-center mt-4">
-                        <button
-                            className={`px-4 py-2 rounded-full ${isPublishing ? 'bg-green-500' : 'bg-blue-500'} text-white`}
-                            onClick={togglePublishing}
-                        >
-                            {isPublishing ? 'Stop Publishing' : 'Start Publishing'}
-                        </button>
-                    </div> */}
                 </div>
             </div>
         </div>

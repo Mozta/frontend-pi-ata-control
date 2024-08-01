@@ -7,6 +7,7 @@ import { Header } from './components/Header';
 import { Tutorial } from './components/Tutorial';
 import { ClerkProvider } from '@clerk/clerk-react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './i18n'; // Importa la configuración de i18n
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 

@@ -9,11 +9,12 @@ import {
 import "@livekit/components-styles";
 import { getToken } from '../services/livekitService';
 import { Player } from '@lottiefiles/react-lottie-player';
+import { useTranslation } from 'react-i18next';
 
 const serverUrl = import.meta.env.VITE_LIVEKIT_SERVER_URL;
-// const serverUrl = 'wss://fab-pinata-zt86ze4g.livekit.cloud';
 
 export const Viewer = ({ username }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [token, setToken] = useState('');
 
@@ -23,22 +24,24 @@ export const Viewer = ({ username }) => {
             setToken(newToken);
         };
         fetchToken();
-    }, []);
+    }, [username]);
 
     const handleLeave = () => {
         navigate('/');
     };
 
     if (!token) {
-        return <div>
-            Loading...
-            <Player
-                autoplay
-                loop
-                src='https://lottie.host/f4cbf879-68e9-4d35-b327-7714ecd51b2c/LUAqjYbmxM.json'
-                className="player"
-            ></Player>
-        </div>;
+        return (
+            <div>
+                {t('loading')}
+                <Player
+                    autoplay
+                    loop
+                    src='https://lottie.host/f4cbf879-68e9-4d35-b327-7714ecd51b2c/LUAqjYbmxM.json'
+                    className="player"
+                ></Player>
+            </div>
+        );
     }
 
     return (
@@ -59,6 +62,5 @@ export const Viewer = ({ username }) => {
                 <ConnectionStateToast />
             </LiveKitRoom>
         </div>
-
     );
 };
